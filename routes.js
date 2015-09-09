@@ -4,7 +4,10 @@ let then = require('express-then')
 let Post = require('./post')
 let fs = require('fs')
 let DataUri = require('datauri')
-
+let blogGet = require('./routes/blog/blog-get')
+let commentPost = require('./routes/comment/comment-post')
+let profileGet = require('./routes/profile/profile-get')
+let deletePostGet = require('./routes/delete/deletepost-get')
 module.exports = (app) => {
   let passport = app.passport
 
@@ -41,7 +44,7 @@ module.exports = (app) => {
     let post = await Post.promise.findById(postId)
     if(!post) res.send(404,'Not found')
 
-    let dataUri = new DataUri()
+    let dataUri = new DataUri
     let image = dataUri.format('.'+post.image.contentType.split('/').pop(),post.image.data)
     console.log('image '+dataUri)
     res.render('post.ejs',{
@@ -63,6 +66,7 @@ module.exports = (app) => {
 
       post.image.data = await fs.promise.readFile(file.path)
       post.image.contentType = file.headers['content-type']
+      post.blogTitle = req.user.blogTitle
       console.log(file, title, content,post.image)
       await post.save()
       console.log("req.user.blogTitle  "+req.user)
@@ -76,8 +80,11 @@ module.exports = (app) => {
 
     post.title = title
     post.content = content
+    console.log("req session value during post edit "+JSON.stringify(req.session))
+    console.log("req session user value during post edit ")
+    console.log(req.user)
+    post.blogTitle = req.user.blogTitle
     await post.save()
-    console.log("Request Object here "+JSON.stringify(req.passport.user))
     res.redirect('/blog/'+encodeURI(req.user.blogTitle))
     return
 
@@ -88,24 +95,26 @@ module.exports = (app) => {
 
 
 
-  app.get('/profile', isLoggedIn, (req, res) => {
+ /* app.get('/profile', isLoggedIn, (req, res) => {
     res.render('profile.ejs', {
       user: req.user,
       message: req.flash('error')
     })
-  })
+  })*/
 
-  app.get('/blog/:blogId', isLoggedIn, (req, res) => {
-    let blogTitle = req.params.blogTitle
-    res.render('blog.ejs', {
-      user: req.user,
-      message: req.flash('error')
-    })
-  })
+  app.get('/profile',isLoggedIn,then(profileGet))
+
+
+  app.get('/blog/:blogTitle', then(blogGet))
+
+  app.post('/comment/:postId',then(commentPost))
 
   app.get('/logout', (req, res) => {
     req.logout()
     res.redirect('/')
   })
+
+  app.get('/delete/:postId',then(deletePostGet))
+
 
 }

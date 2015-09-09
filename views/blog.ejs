@@ -45,16 +45,21 @@
             <h6><i> Last Modified: <%= blogPosts[i].displayDate%> </i></h6>
             <p><%=blogPosts[i].content%></p>
         </div>
+        <% if(user) {%>
+
+        <%}%>
+        <% if(blogPosts[i].comments) {%>
         <div class="col-xs-12">
             <h4>Comments</h4>
             <% for(var j=0; j<blogPosts[i].comments.length; j++) {%>
             <div class="comment">
-                <h5><%= blogPosts[i].comments[j].username%></h5>
-                <h6><%= blogPosts[i].comments[j].dateUpdated%></h6>
-                <p><%= blogPosts[i].comments[j].commentText%></p>
+               by <%= blogPosts[i].comments[j].username%> |
+                <%= blogPosts[i].comments[j].updated_at%> |
+                <%= blogPosts[i].comments[j].comment%>
             </div>
             <% } %>
         </div>
+        <% } %>
         <div class="col-xs-12 comment-field">
             <form action="/comment/<%= blogPosts[i].id %>" method="post">
                 <div class="row">

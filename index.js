@@ -8,6 +8,7 @@ let flash = require('connect-flash')
 let mongoose = require('mongoose')
 let passportMiddleware = require('./middleware/passport')
 let routes = require('./routes')
+require('babel/register')
 require('songbird')
 
 // const NODE_ENV = process.env.NODE_ENV
@@ -33,6 +34,7 @@ app.set('view engine', 'ejs')
 app.use(session({
   secret: 'ilovethenodejs',
   resave: true,
+  cookie : { secure : false, maxAge : (4 * 60 * 60 * 1000) },
   saveUninitialized: true
 }))
 

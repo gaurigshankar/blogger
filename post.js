@@ -25,10 +25,8 @@ let PostSchema = mongoose.Schema({
 })
 
 PostSchema.pre('save',  function (next) {
-    console.log('Pre ssave ')
     let now = new Date();
     this.updated_at = now;
-    console.log(this)
     if ( !this.created_at ) {
         this.created_at = now;
     }

@@ -9,6 +9,7 @@ module.exports = (app) => {
   passport.use(new LocalStrategy({
     // Use "email" field instead of "username"
     usernameField: 'username',
+
     failureFlash: true
   }, nodeifyit(async (username, password) => {
       let user
@@ -36,7 +37,10 @@ module.exports = (app) => {
 
   passport.serializeUser(nodeifyit(async (user) => user._id))
   passport.deserializeUser(nodeifyit(async (id) => {
-    return await User.promise.findById(id)
+      console.log("deserializ called")
+      let user = await User.promise.findById(id)
+      console.log("User object in desrialize "+user)
+    return user
   }))
 
   passport.use('local-signup', new LocalStrategy({
